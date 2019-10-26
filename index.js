@@ -3,17 +3,15 @@ const token = '1007279553:AAFkoRTwYuYQ4bs8nxo7ANX-Fd30uPGvyWg';
 
 const bot = new TelegramBot(token, {polling: true});
 
-console.log(new Date(2019, 9, 2));
+var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 var calendar = [];
 var today = new Date();
 var lastDayOfMonth = new Date(today.getFullYear(), today.getMonth()+1, 0);
-var firstDayOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 var lengthOfMonth = lastDayOfMonth.getDate();
-console.log(lengthOfMonth);
 for(var d=1; d<=lengthOfMonth; ++d) {
 	cd_arr = [];
-	var cd = new Date(today.getFullYear(), today.getMonth(), d);
-	cd_arr.push(cd);
+	var cd = new Date(today.getFullYear(), today.getMonth(), d, 8);
+	cd_arr.push(days[cd.getDay()].toString() + " " + cd.getDate().toString() + "/" + (cd.getMonth()+1).toString() + "/" + cd.getFullYear().toString());
 	calendar.push(cd_arr);
 }
 
