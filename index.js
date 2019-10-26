@@ -11,19 +11,23 @@ var lengthOfMonth = lastDayOfMonth.getDate();
 for(var d=1; d<=lengthOfMonth; ++d) {
 	cd_arr = [];
 	var cd = new Date(today.getFullYear(), today.getMonth(), d, 8);
-	cd_arr.push(days[cd.getDay()].toString() + " " + cd.getDate().toString() + "/" + (cd.getMonth()+1).toString() + "/" + cd.getFullYear().toString());
+	cd_str = days[cd.getDay()].toString() + " " + cd.getDate().toString() + "/" + (cd.getMonth()+1).toString() + "/" + cd.getFullYear().toString()
+	cd_arr.push({
+		text: cd_str,
+		callback_data: cd_str
+	});
 	calendar.push(cd_arr);
 }
 
 bot.onText(/\/calendar/, (msg) => {	
   bot.sendMessage(msg.chat.id, "Pick your free dates", {
 		"reply_markup": {
-		  "keyboard": calendar
+		  "inline_keyboard": calendar
 		}
 	});    
 });
 
-bot.onText(/\d{1,2}/g, (msg) => {
-	console.log(msg.from.id);
-	bot.sendMessage(msg.chat.id, "You have chosen " + msg.text);
-});
+bot.on("callback_query", (callback_query) => {
+	const data = callback_query.data;
+  bot.answerCallbackQuery(callback_query.id, "You picked " + data);
+})
