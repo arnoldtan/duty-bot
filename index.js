@@ -1,7 +1,9 @@
 const TelegramBot = require('node-telegram-bot-api');
-const token = '1007279553:AAFkoRTwYuYQ4bs8nxo7ANX-Fd30uPGvyWg';
+const token = require('token').TOKEN;
 
 const bot = new TelegramBot(token, {polling: true});
+
+var db = new Map();
 
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
 var calendar = [];
@@ -19,6 +21,20 @@ for(var d=1; d<=lengthOfMonth; ++d) {
 	calendar.push(cd_arr);
 }
 
+bot.onText(/\/join/, (msg) => {
+	db.set(msg.from.id, []);
+	bot.sendMessage(msg.chat.id, "Welcome to Hell!");
+	console.log(db);
+});
+
+bot.onText(/\/leave/, (msg) => {
+	console.log(msg);
+	db.delete(msg.from.id);
+	bot.sendMessage(msg.chat.id, "ORD loh!");
+	bot.kickChatMember(msg.chat.id, msg.from.id);
+	console.log(db);
+});
+
 bot.onText(/\/calendar/, (msg) => {	
   bot.sendMessage(msg.chat.id, "Pick your free dates", {
 		"reply_markup": {
@@ -29,5 +45,9 @@ bot.onText(/\/calendar/, (msg) => {
 
 bot.on("callback_query", (callback_query) => {
 	const data = callback_query.data;
+	var cur = db.get(callback_query.from.id);
+	cur.push(data);
+	db.set(callback_query.from.id, cur);
   bot.answerCallbackQuery(callback_query.id, "You picked " + data);
+  console.log(db);
 })
