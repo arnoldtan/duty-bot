@@ -64,3 +64,21 @@ bot.onText(/\/roster/, (msg) => {
 	}
 })
 
+bot.onText(/^\/check (\d{1,2})\/(\d{1,2})\/(\d{4})$/, (msg, match) => {
+	var it = db.values();
+	var date = "";
+	date = date.concat(msg.text.replace("/check ",""));
+	var fulldate = new Date(match[2] + "/" + match[1] + "/" + match[3]);
+	fulldate = days[fulldate.getDay()];
+	fulldate = fulldate.concat(" ");
+	fulldate = fulldate.concat(date);
+	bot.sendMessage(msg.chat.id, fulldate);
+	for(var i = 0; i<db.size; i++){
+		var user = it.next().value;
+		if(user.ad.has(fulldate)){
+			bot.sendMessage(msg.chat.id, user.name);
+		}
+	}
+})
+
+
