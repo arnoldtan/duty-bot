@@ -53,3 +53,14 @@ bot.on("callback_query", (callback_query) => {
   bot.answerCallbackQuery(callback_query.id, "You picked " + data);
   console.log(db);
 })
+
+bot.onText(/\/roster/, (msg) => {
+	var roster = "";
+	var it = db.values();
+	for(var i = 0; i<db.size; i++){
+		roster = roster.concat(it.next().value.name + "\n");
+	}
+	bot.sendMessage(msg.chat.id, "Here is the roster:\n" + roster);{
+	}
+})
+
