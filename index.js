@@ -25,16 +25,16 @@ bot.onText(/\/join (.+)/, (msg, match) => {
 	if(db.get(msg.from.id) === undefined) {
 		db.set(msg.from.id, {
 			name: match[1],
-			ad: []
+			ad: new Set()
 		});
 		bot.sendMessage(msg.chat.id, "Welcome " + match[1] + "!");
+		console.log(db);
 	} else bot.sendMessage(msg.chat.id, "You have already joined");
 });
 
 bot.onText(/\/leave/, (msg) => {
 	db.delete(msg.from.id);
-	bot.sendMessage(msg.chat.id, "ORD loh!");
-	bot.kickChatMember(msg.chat.id, msg.from.id);
+	bot.sendMessage(msg.chat.id, "You have left. ORD loh!");
 });
 
 bot.onText(/\/calendar/, (msg) => {	
@@ -48,7 +48,7 @@ bot.onText(/\/calendar/, (msg) => {
 bot.on("callback_query", (callback_query) => {
 	const data = callback_query.data;
 	var cur = db.get(callback_query.from.id);
-	cur.ad.push(data);
+	cur.ad.add(data);
 	db.set(callback_query.from.id, cur);
   bot.answerCallbackQuery(callback_query.id, "You picked " + data);
   console.log(db);
