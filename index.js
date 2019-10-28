@@ -21,32 +21,34 @@ for(var d=1; d<=lengthOfMonth; ++d) {
 	calendar.push(cd_arr);
 }
 
-bot.onText(/\/join/, (msg) => {
-	db.set(msg.from.id, []);
-	bot.sendMessage(msg.chat.id, "Welcome to Hell!");
-	console.log(db);
+bot.onText(/\/join (.+)/, (msg, match) => {
+	if(db.get(msg.from.id) === undefined) {
+		db.set(msg.from.id, {
+			name: match[1],
+			ad: []
+		});
+		bot.sendMessage(msg.chat.id, "Welcome " + match[1] + "!");
+	} else bot.sendMessage(msg.chat.id, "You have already joined");
 });
 
 bot.onText(/\/leave/, (msg) => {
-	console.log(msg);
 	db.delete(msg.from.id);
 	bot.sendMessage(msg.chat.id, "ORD loh!");
 	bot.kickChatMember(msg.chat.id, msg.from.id);
-	console.log(db);
 });
 
 bot.onText(/\/calendar/, (msg) => {	
-  bot.sendMessage(msg.chat.id, "Pick your free dates", {
+	bot.sendMessage(msg.chat.id, "Pick your free dates", {
 		"reply_markup": {
 		  "inline_keyboard": calendar
 		}
-	});    
+	}); 
 });
 
 bot.on("callback_query", (callback_query) => {
 	const data = callback_query.data;
 	var cur = db.get(callback_query.from.id);
-	cur.push(data);
+	cur.ad.push(data);
 	db.set(callback_query.from.id, cur);
   bot.answerCallbackQuery(callback_query.id, "You picked " + data);
   console.log(db);
