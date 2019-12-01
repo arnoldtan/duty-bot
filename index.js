@@ -62,5 +62,4 @@ bot.onText(/\/roster/, (msg) => {
 	}
 	bot.sendMessage(msg.chat.id, "Here is the roster:\n" + roster);{
 	}
-})
-
+});
