@@ -87,7 +87,7 @@ bot.onText(/\/duty/, (msg) => {
 	var text = "";
 	for(var i = 0; i<db.size; i++){
 		var user = it.next().value;
-		for (var it = user.ad.values(), val= null; val=it.next().value; ) {
+		for (var it2 = user.ad.values(), val= null; val=it2.next().value; ) {
 		var line = val;
 		line = line.concat(": " +user.name + "\n");
     	text = text.concat(line);
