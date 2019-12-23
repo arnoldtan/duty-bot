@@ -80,3 +80,18 @@ bot.onText(/^\/check (\d{1,2})\/(\d{1,2})\/(\d{4})$/, (msg, match) => {
 		}
 	}
 });
+
+bot.onText(/\/duty/, (msg) => {
+	bot.sendMessage(msg.chat.id, "Here is the duty roster for the month:");
+	var it = db.values();
+	var text = "";
+	for(var i = 0; i<db.size; i++){
+		var user = it.next().value;
+		for (var it = user.ad.values(), val= null; val=it.next().value; ) {
+		var line = val;
+		line = line.concat(": " +user.name + "\n");
+    	text = text.concat(line);
+        }
+	}
+	bot.sendMessage(msg.chat.id, text);
+});
