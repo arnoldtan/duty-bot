@@ -88,13 +88,13 @@ bot.onText(/\/duty/, (msg) => {
 	var text = "";
 	for(var i = 0; i<db.size; i++){
 		var user = it.next().value;
-		for (var it2 = user.ad.values(), val= null; val=it2.next().value; ) {
-		var date = val;
-		for(var j = 0; j<7; j++){
-        var date = date.replace(days[j], "");
-        var date = date.replace(" ", "");
-		}
-		list.push([date,user.name]);
+		for (var it2=user.ad.values(), val=null; val=it2.next().value; ) {
+			var date = val;
+			for(var j = 0; j<7; j++){
+		        var date = date.replace(days[j], "");
+		        var date = date.replace(" ", "");
+			}
+			list.push([date, user.name]);
         }
 	}
 	list.sort();
