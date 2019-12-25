@@ -6,20 +6,32 @@ const bot = new TelegramBot(token, {polling: true});
 var db = new Map();
 
 var days = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-var calendar = [];
+var months = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 var today = new Date();
-var lastDayOfMonth = new Date(today.getFullYear(), today.getMonth()+1, 0);
-var lengthOfMonth = lastDayOfMonth.getDate();
+var calendar = [[{ text: months[today.getMonth()], callback_data: "X" }],
+				[{ text: "S", callback_data: "X"},
+				 { text: "M", callback_data: "X"},
+				 { text: "T", callback_data: "X"},
+				 { text: "W", callback_data: "X"},
+				 { text: "T", callback_data: "X"},
+				 { text: "F", callback_data: "X"},
+				 { text: "S", callback_data: "X"}]];
+var lastDateOfMonth = new Date(today.getFullYear(), today.getMonth()+1, 0);
+var lengthOfMonth = lastDateOfMonth.getDate();
+var firstDateOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+var firstDayOfMonth = firstDateOfMonth.getDay();
+var lastDayOfMonth = lastDateOfMonth.getDay();
+calendar.push([]);
+for(var i=0; i<firstDayOfMonth; ++i) calendar[2].push({ text: " ", callback_data: "X"});
 for(var d=1; d<=lengthOfMonth; ++d) {
-	cd_arr = [];
+	var cur = firstDayOfMonth + d;
+	var row = Math.ceil(cur / 7);
+	if(calendar.length < 2 + row) calendar.push([]);
 	var cd = new Date(today.getFullYear(), today.getMonth(), d, 8);
-	cd_str = days[cd.getDay()].toString() + " " + cd.getDate().toString() + "/" + (cd.getMonth()+1).toString() + "/" + cd.getFullYear().toString()
-	cd_arr.push({
-		text: cd_str,
-		callback_data: cd_str
-	});
-	calendar.push(cd_arr);
+	var cd_str = days[cd.getDay()].toString() + " " + cd.getDate().toString() + "/" + (cd.getMonth()+1).toString() + "/" + cd.getFullYear().toString()
+	calendar[row + 1].push({ text: d.toString(), callback_data: cd_str });
 }
+for(var i=lastDayOfMonth+1; i<7; ++i) calendar[calendar.length-1].push({ text: " ", callback_data: "X"});
 
 bot.onText(/\/join (.+)/, (msg, match) => {
 	if(db.get(msg.from.id) === undefined) {
@@ -47,11 +59,14 @@ bot.onText(/\/calendar/, (msg) => {
 
 bot.on("callback_query", (callback_query) => {
 	const data = callback_query.data;
-	var cur = db.get(callback_query.from.id);
-	cur.ad.add(data);
-	db.set(callback_query.from.id, cur);
-  bot.answerCallbackQuery(callback_query.id, "You picked " + data);
-  console.log(db);
+	if(data === "X") bot.answerCallbackQuery(callback_query.id, "Invalid Selection");
+	else {
+		var cur = db.get(callback_query.from.id);
+		cur.ad.add(data);
+		db.set(callback_query.from.id, cur);
+		bot.answerCallbackQuery(callback_query.id, "You picked " + data);
+		console.log(db);
+	}
 })
 
 bot.onText(/\/roster/, (msg) => {
