@@ -82,16 +82,25 @@ bot.onText(/^\/check (\d{1,2})\/(\d{1,2})\/(\d{4})$/, (msg, match) => {
 });
 
 bot.onText(/\/duty/, (msg) => {
+	var list = [];
 	bot.sendMessage(msg.chat.id, "Here is the duty roster for the month:");
 	var it = db.values();
 	var text = "";
 	for(var i = 0; i<db.size; i++){
 		var user = it.next().value;
 		for (var it2 = user.ad.values(), val= null; val=it2.next().value; ) {
-		var line = val;
-		line = line.concat(": " +user.name + "\n");
-    	text = text.concat(line);
+		var date = val;
+		for(var j = 0; j<7; j++){
+        var date = date.replace(days[j], "");
+        var date = date.replace(" ", "");
+		}
+		list.push([date,user.name]);
         }
 	}
+	list.sort();
+	for(var i = 0; i<list.length; i++){
+		text = text.concat(list[i][0]+ ": " + list[i][1] + "\n");
+	}
+    console.log(list);
 	bot.sendMessage(msg.chat.id, text);
 });
