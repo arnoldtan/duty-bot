@@ -21,6 +21,10 @@ var lengthOfMonth = lastDateOfMonth.getDate();
 var firstDateOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 var firstDayOfMonth = firstDateOfMonth.getDay();
 var lastDayOfMonth = lastDateOfMonth.getDay();
+var dutylist = [];
+for(var i=0; i<lengthOfMonth; ++i) dutylist.push('');
+var month = [];
+
 calendar.push([]);
 for(var i=0; i<firstDayOfMonth; ++i) calendar[2].push({ text: " ", callback_data: "X"});
 for(var d=1; d<=lengthOfMonth; ++d) {
@@ -30,6 +34,7 @@ for(var d=1; d<=lengthOfMonth; ++d) {
 	var cd = new Date(today.getFullYear(), today.getMonth(), d, 8);
 	var cd_str = days[cd.getDay()].toString() + " " + cd.getDate().toString() + "/" + (cd.getMonth()+1).toString() + "/" + cd.getFullYear().toString()
 	calendar[row + 1].push({ text: d.toString(), callback_data: cd_str });
+	month.push(cd_str);
 }
 for(var i=lastDayOfMonth+1; i<7; ++i) calendar[calendar.length-1].push({ text: " ", callback_data: "X"});
 
@@ -62,6 +67,8 @@ bot.on("callback_query", (callback_query) => {
 	if(data === "X") bot.answerCallbackQuery(callback_query.id, "Invalid Selection");
 	else {
 		var cur = db.get(callback_query.from.id);
+		var day = data.split(" ")[1].split("/")[0];
+		dutylist[Number(day)-1] = cur.name;
 		cur.ad.add(data);
 		db.set(callback_query.from.id, cur);
 		bot.answerCallbackQuery(callback_query.id, "You picked " + data);
@@ -97,25 +104,16 @@ bot.onText(/^\/check (\d{1,2})\/(\d{1,2})\/(\d{4})$/, (msg, match) => {
 });
 
 bot.onText(/\/duty/, (msg) => {
-	var list = [];
-	bot.sendMessage(msg.chat.id, "Here is the duty roster for the month:");
-	var it = db.values();
 	var text = "";
-	for(var i = 0; i<db.size; i++){
-		var user = it.next().value;
-		for (var it2=user.ad.values(), val=null; val=it2.next().value; ) {
-			var date = val;
-			for(var j = 0; j<7; j++){
-		        var date = date.replace(days[j], "");
-		        var date = date.replace(" ", "");
-			}
-			list.push([date, user.name]);
-        }
-	}
-	list.sort();
-	for(var i = 0; i<list.length; i++){
-		text = text.concat(list[i][0]+ ": " + list[i][1] + "\n");
-	}
-    console.log(list);
+	for(var i=0; i<lengthOfMonth; ++i){
+		text = text.concat(month[i] + ": ");
+				if(dutylist[i] == ""){
+			text = text.concat("Not assigned" + "\n");
+		}
+		else{
+			text = text.concat(dutylist[i] + "\n");
+		}
+		text = text.concat("\n");
+	} 
 	bot.sendMessage(msg.chat.id, text);
 });
